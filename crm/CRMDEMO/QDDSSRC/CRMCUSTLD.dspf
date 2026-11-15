@@ -1,0 +1,92 @@
+     A* CRMCUSTLD - Customer list (24 x 80)
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      CA03
+     A                                      CF04
+     A                                      CF05
+     A                                      CF06
+     A                                      CF10
+     A                                      CA12
+     A                                      CF21
+     A*
+     A          R CUSTSFL                   SFL
+     A            SOPT           1A  B  9  3
+     A  50                                  DSPATR(RI PC)
+     A            SCUSTID        7Y 0O  9  6EDTCDE(Z)
+     A            SNAME         26A  O  9 14
+     A            SCITY         14A  O  9 41
+     A            SSTATE         2A  O  9 56
+     A            SSTSD          8A  O  9 59
+     A  61                                  COLOR(PNK)
+     A            SOWNER        10A  O  9 68
+     A  62                                  COLOR(WHT)
+     A*
+     A          R CUSTCTL                   SFLCTL(CUSTSFL)
+     A                                      SFLSIZ(9999)
+     A                                      SFLPAG(14)
+     A                                      OVERLAY
+     A  30                                  SFLDSP
+     A  31                                  SFLDSPCTL
+     A  32                                  SFLCLR
+     A  33                                  SFLEND(*MORE)
+     A                                      RTNCSRLOC(&CSRRCD &CSRFLD)
+     A            CSRRCD        10A  H
+     A            CSRFLD        10A  H
+     A                                  1  2'CRMCUSTL'
+     A                                      COLOR(BLU)
+     A                                  1 36'Customers'
+     A                                      DSPATR(HI)
+     A                                  1 70DATE(*JOB *YY)
+     A                                      EDTCDE(Y)
+     A                                  2  2'User:'
+     A            CUSER         10A  O  2  8
+     A            CCOUNT         5Y 0O  2 30EDTCDE(3)
+     A                                  2 36'customers shown'
+     A                                  2 70TIME
+     A                                  3  2'Name contains'
+     A            CSRCH         25A  B  3 16
+     A                                      CHECK(LC)
+     A                                  3 43'Status'
+     A            CSTS           1A  B  3 50
+     A  51                                  DSPATR(RI PC)
+     A                                  3 53'Mine only'
+     A            CMINE          1A  B  3 63
+     A  52                                  DSPATR(RI PC)
+     A                                  3 66'(Y/N)'
+     A                                  5  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  6  3'2=Change  4=Delete  5=Display  7=A-
+     A                                      ctivities  8=Contacts'
+     A                                      COLOR(BLU)
+     A                                  7  3'9=Opportunities'
+     A                                      COLOR(BLU)
+     A                                  8  2'Opt'
+     A                                      COLOR(WHT)
+     A                                  8  6'Cust #'
+     A                                      COLOR(WHT)
+     A                                  8 14'Customer name'
+     A                                      COLOR(WHT)
+     A                                  8 41'City'
+     A                                      COLOR(WHT)
+     A                                  8 56'St'
+     A                                      COLOR(WHT)
+     A                                  8 59'Status'
+     A                                      COLOR(WHT)
+     A                                  8 68'Owner'
+     A                                      COLOR(WHT)
+     A*
+     A          R FKEYS
+     A                                 23  2'F3=Exit  F4=Prompt  F5=Refresh  F6-
+     A                                      =Add  F12=Cancel  F21=Print list'
+     A                                      COLOR(BLU)
+     A            FMSG          78A  O 24  2COLOR(WHT)
+     A*
+     A          R CONFWDW                   WINDOW(8 12 7 54)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A                                      WDWTITLE((*TEXT 'Confirm delete')  -
+     A                                      (*COLOR WHT))
+     A            WTEXT1        50A  O  2  2DSPATR(HI)
+     A            WTEXT2        50A  O  3  2
+     A                                  5  2'F10=Delete    F12=Cancel'
+     A                                      COLOR(BLU)

@@ -1,0 +1,100 @@
+     A* CRMRPTP - CRM demo reports (132 columns, 66 lines)
+     A* Create with PAGESIZE(66 132) OVRFLW(60)
+     A*
+     A          R HEADER                    SKIPB(1)
+     A                                     1'CRMDEMO'
+     A            RTITLE        50A       42
+     A                                   110'Page'
+     A                                   115PAGNBR
+     A                                      EDTCDE(Z)
+     A                                     1'Printed'
+     A                                      SPACEB(1)
+     A                                     9DATE(*JOB *YY)
+     A                                      EDTCDE(Y)
+     A                                    21TIME
+     A                                    31'by'
+     A            RUSER         10A       34
+     A            RSUBT         60A       42
+     A*
+     A          R CUSTCOLS                  SPACEB(2)
+     A                                     1'Cust #'
+     A                                    10'Customer name'
+     A                                    52'Status'
+     A                                    64'Industry'
+     A                                    76'City'
+     A                                   102'St'
+     A                                   106'Phone'
+     A                                   123'Owner'
+     A                                    14'Contact name'
+     A                                      SPACEB(1)
+     A                                    48'Title'
+     A                                    80'Phone'
+     A                                    97'Email'
+     A                                     1'-----------------------------------
+     A                                      ------------------------------------
+     A                                      ------------------------------------
+     A                                      ----------------------------'
+     A                                      SPACEB(1)
+     A*
+     A          R CUSTDTL                   SPACEB(2)
+     A            PCUSTID        7S 0      1EDTCDE(Z)
+     A            PNAME         40A       10
+     A            PSTSD         10A       52
+     A            PIND          10A       64
+     A            PCITY         25A       76
+     A            PST            2A      102
+     A            PPHONE        15A      106
+     A            POWNER        10A      123
+     A*
+     A          R CONTDTL                   SPACEB(1)
+     A            PCPRIM         1A       12
+     A            PCNAME        30A       14
+     A            PCTITLE       30A       48
+     A            PCPHONE       15A       80
+     A            PCEMAIL       36A       97
+     A*
+     A          R PIPECOLS                  SPACEB(2)
+     A                                     1'Opp #'
+     A                                    10'Customer'
+     A                                    40'Opportunity'
+     A                                    74'Close date'
+     A                                    86'Owner'
+     A                                   104'Amount'
+     A                                   111'Prob'
+     A                                   123'Weighted'
+     A                                     1'-----------------------------------
+     A                                      ------------------------------------
+     A                                      ------------------------------------
+     A                                      ----------------------------'
+     A                                      SPACEB(1)
+     A*
+     A          R STGHDR                    SPACEB(2)
+     A            PSTGNM        40A        1
+     A*
+     A          R PIPEDTL                   SPACEB(1)
+     A            POPPID         7S 0      1EDTCDE(Z)
+     A            PPCUST        28A       10
+     A            POPP          32A       40
+     A            PCLOSE        10A       74
+     A            PPOWNER       10A       86
+     A            PAMT          11S 2     97EDTCDE(1)
+     A            PPROB          3S 0    112EDTCDE(3)
+     A                                   115'%'
+     A            PWGT          11S 2    118EDTCDE(1)
+     A*
+     A          R STGTOT                    SPACEB(1)
+     A                                    40'Stage total:'
+     A            PSCNT          5S 0     53EDTCDE(3)
+     A                                    59'deals'
+     A            PSAMT         11S 2     97EDTCDE(1)
+     A            PSWGT         11S 2    118EDTCDE(1)
+     A*
+     A          R GRDTOT                    SPACEB(2)
+     A                                    40'Open pipeline total:'
+     A            PGCNT          5S 0     61EDTCDE(3)
+     A                                    67'deals'
+     A            PGAMT         11S 2     97EDTCDE(1)
+     A            PGWGT         11S 2    118EDTCDE(1)
+     A*
+     A          R ENDRPT                    SPACEB(3)
+     A                                    50'*** End of report ***'

@@ -1,0 +1,35 @@
+     A* CRMPRMPTD - F4 prompt window (24 x 80)
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      CA12
+     A*
+     A* DUMMY keeps the caller's screen visible behind the window
+     A          R DUMMY                     ASSUME
+     A                                  1  2' '
+     A*
+     A          R PRMSFL                    SFL
+     A            SOPT           1A  B  4  2
+     A            SCODE         10A  O  4  5
+     A            SDESC         30A  O  4 16
+     A*
+     A          R PRMCTL                    SFLCTL(PRMSFL)
+     A                                      SFLSIZ(100)
+     A                                      SFLPAG(8)
+     A                                      WINDOW(4 30 13 46)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A  30                                  SFLDSP
+     A  31                                  SFLDSPCTL
+     A  32                                  SFLCLR
+     A  33                                  SFLEND(*MORE)
+     A            PTITLE        40A  O  1  2DSPATR(HI)
+     A                                  2  2'Type 1 to select, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  3  2'Opt'
+     A                                      COLOR(WHT)
+     A                                  3  5'Code'
+     A                                      COLOR(WHT)
+     A                                  3 16'Description'
+     A                                      COLOR(WHT)
+     A                                 12  2'F12=Cancel'
+     A                                      COLOR(BLU)

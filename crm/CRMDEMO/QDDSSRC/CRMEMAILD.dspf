@@ -1,0 +1,44 @@
+     A* CRMEMAILD - Send email window (24 x 80)
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      CF10
+     A                                      CA12
+     A*
+     A          R DUMMY                     ASSUME
+     A                                  1  2' '
+     A*
+     A          R EMLWDW                    WINDOW(3 2 17 74)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A                                      WDWTITLE((*TEXT 'Send email')      -
+     A                                      (*COLOR WHT))
+     A                                  2  2'To'
+     A            ETO           60A  B  2 13
+     A                                      CHECK(LC)
+     A  51                                  DSPATR(RI PC)
+     A                                  3  2'Name'
+     A            ENAME         40A  O  3 13
+     A                                  4  2'Subject'
+     A            ESUBJ         60A  B  4 13
+     A                                      CHECK(LC)
+     A  52                                  DSPATR(RI PC)
+     A                                  6  2'Message'
+     A                                      COLOR(WHT)
+     A            EBODY1        70A  B  7  3
+     A                                      CHECK(LC)
+     A            EBODY2        70A  B  8  3
+     A                                      CHECK(LC)
+     A            EBODY3        70A  B  9  3
+     A                                      CHECK(LC)
+     A            EBODY4        70A  B 10  3
+     A                                      CHECK(LC)
+     A            EBODY5        70A  B 11  3
+     A                                      CHECK(LC)
+     A            EBODY6        70A  B 12  3
+     A                                      CHECK(LC)
+     A                                 14  2'Sent with SNDSMTPEMM and logged as-
+     A                                       an activity.'
+     A                                      COLOR(BLU)
+     A                                 15  2'F10=Send    F12=Cancel'
+     A                                      COLOR(BLU)
+     A            EMSG          70A  O 16  2COLOR(WHT)

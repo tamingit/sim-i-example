@@ -1,0 +1,48 @@
+     A* CRMMENUD - CRM demo main menu (24 x 80)
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      CA03
+     A                                      CF05
+     A          R MENU
+     A                                  1  2'CRMMENU'
+     A                                      COLOR(BLU)
+     A                                  1 30'CRM Demo - Main Menu'
+     A                                      DSPATR(HI)
+     A                                  1 70DATE(*JOB *YY)
+     A                                      EDTCDE(Y)
+     A                                  2  2'User:'
+     A            MUSER         10A  O  2  8
+     A            MNAME         30A  O  2 19
+     A                                  2 70TIME
+     A                                  4  2'Select one of the following:'
+     A                                  6  5'1. Customers'
+     A                                  7  5'2. My open tasks'
+     A                                  8  5'3. Sales pipeline'
+     A                                  8 40'(27 x 132)'
+     A                                      COLOR(BLU)
+     A                                  9  5'4. Live dashboard'
+     A                                  9 40'(27 x 132, refreshes by itself)'
+     A                                      COLOR(BLU)
+     A                                 10  5'5. Print reports'
+     A                                 11  5'6. Send an email'
+     A                                 13  2'Open tasks assigned to you:'
+     A            MOPEN          5Y 0O 13 31EDTCDE(3)
+     A                                 13 39'Overdue:'
+     A            MOVER          5Y 0O 13 48EDTCDE(3)
+     A  60                                  COLOR(RED)
+     A                                 15  2'Tip: open more sessions and run:'
+     A                                 15 36'CRMDEMO/CRM *DASH'
+     A                                      COLOR(WHT)
+     A                                 16 36'CRMDEMO/CRM *PIPE'
+     A                                      COLOR(WHT)
+     A                                 17 36'CRMDEMO/CRM *TASKS'
+     A                                      COLOR(WHT)
+     A                                 18 36'CRMDEMO/CRM *CUST'
+     A                                      COLOR(WHT)
+     A                                 20  2'Selection'
+     A                                 21  2'===>'
+     A            MOPT           2A  B 21  7
+     A  50                                  DSPATR(RI PC)
+     A                                 23  2'F3=Exit   F5=Refresh'
+     A                                      COLOR(BLU)
+     A            MMSG          78A  O 24  2COLOR(WHT)

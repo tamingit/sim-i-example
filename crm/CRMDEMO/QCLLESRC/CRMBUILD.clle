@@ -1,0 +1,168 @@
+/* ================================================================ */
+/* CRMBUILD - Build the CRM demo in library CRMDEMO                */
+/*                                                                  */
+/*   CALL CRMDEMO/CRMBUILD PARM('*YES')                             */
+/*        drop/create tables, load sample data, compile everything  */
+/*   CALL CRMDEMO/CRMBUILD PARM('*NO')                              */
+/*        compile objects only (keeps the data)                     */
+/*                                                                  */
+/* Compile this program first:                                      */
+/*   CRTBNDCL PGM(CRMDEMO/CRMBUILD) SRCFILE(CRMDEMO/QCLLESRC)       */
+/* ================================================================ */
+             PGM        PARM(&DB)
+
+             DCL        VAR(&DB) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&LIB) TYPE(*CHAR) LEN(10) VALUE('CRMDEMO')
+             DCL        VAR(&OBJ) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&ERRS) TYPE(*DEC) LEN(3 0) VALUE(0)
+             DCL        VAR(&FAILED) TYPE(*CHAR) LEN(200)
+
+             ADDLIBLE   LIB(CRMDEMO) POSITION(*FIRST)
+             MONMSG     MSGID(CPF2103)
+
+/* ---- 1. Database ------------------------------------------------ */
+             IF         COND(&DB *EQ '*YES') THEN(DO)
+                SNDPGMMSG  MSG('CRMBUILD: creating tables') +
+                             TOPGMQ(*EXT) MSGTYPE(*STATUS)
+                RUNSQLSTM  SRCFILE(CRMDEMO/QSQLSRC) SRCMBR(CRMDROP) +
+                             COMMIT(*NONE) NAMING(*SQL) ERRLVL(40)
+                MONMSG     MSGID(CPF0000 SQL0000)
+                RUNSQLSTM  SRCFILE(CRMDEMO/QSQLSRC) SRCMBR(CRMTABLES) +
+                             COMMIT(*NONE) NAMING(*SQL)
+                MONMSG     MSGID(CPF0000 SQL0000) EXEC(DO)
+                   SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                                MSGDTA('CRMTABLES failed - see the +
+                                RUNSQLSTM spooled file') +
+                                MSGTYPE(*ESCAPE)
+                ENDDO
+                SNDPGMMSG  MSG('CRMBUILD: loading sample data') +
+                             TOPGMQ(*EXT) MSGTYPE(*STATUS)
+                RUNSQLSTM  SRCFILE(CRMDEMO/QSQLSRC) SRCMBR(CRMSEED) +
+                             COMMIT(*NONE) NAMING(*SQL)
+                MONMSG     MSGID(CPF0000 SQL0000) EXEC(DO)
+                   SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                                MSGDTA('CRMSEED failed - see the +
+                                RUNSQLSTM spooled file') +
+                                MSGTYPE(*ESCAPE)
+                ENDDO
+             ENDDO
+
+/* ---- 2. Display and printer files -------------------------------- */
+             CHGVAR     VAR(&OBJ) VALUE('CRMMENUD')
+             CALLSUBR   SUBR(DSPF)
+             CHGVAR     VAR(&OBJ) VALUE('CRMCUSTLD')
+             CALLSUBR   SUBR(DSPF)
+             CHGVAR     VAR(&OBJ) VALUE('CRMCUSTMD')
+             CALLSUBR   SUBR(DSPF)
+             CHGVAR     VAR(&OBJ) VALUE('CRMCONTD')
+             CALLSUBR   SUBR(DSPF)
+             CHGVAR     VAR(&OBJ) VALUE('CRMACTD')
+             CALLSUBR   SUBR(DSPF)
+             CHGVAR     VAR(&OBJ) VALUE('CRMPRMPTD')
+             CALLSUBR   SUBR(DSPF)
+             CHGVAR     VAR(&OBJ) VALUE('CRMEMAILD')
+             CALLSUBR   SUBR(DSPF)
+             CHGVAR     VAR(&OBJ) VALUE('CRMPRTD')
+             CALLSUBR   SUBR(DSPF)
+             CHGVAR     VAR(&OBJ) VALUE('CRMPIPED')
+             CALLSUBR   SUBR(DSPF)
+
+             /* The dashboard times out its READ every 2 seconds */
+             CHGVAR     VAR(&OBJ) VALUE('CRMDASHD')
+             CRTDSPF    FILE(CRMDEMO/CRMDASHD) +
+                          SRCFILE(CRMDEMO/QDDSSRC) SRCMBR(CRMDASHD) +
+                          RSTDSP(*YES) WAITRCD(2) REPLACE(*YES)
+             MONMSG     MSGID(CPF0000) EXEC(CALLSUBR SUBR(FAIL))
+
+             CHGVAR     VAR(&OBJ) VALUE('CRMRPTP')
+             CRTPRTF    FILE(CRMDEMO/CRMRPTP) +
+                          SRCFILE(CRMDEMO/QDDSSRC) SRCMBR(CRMRPTP) +
+                          PAGESIZE(66 132) OVRFLW(60) REPLACE(*YES)
+             MONMSG     MSGID(CPF0000) EXEC(CALLSUBR SUBR(FAIL))
+
+/* ---- 3. Service program and binding directory ------------------- */
+             CHGVAR     VAR(&OBJ) VALUE('CRMSRV')
+             CRTSQLRPGI OBJ(CRMDEMO/CRMSRV) +
+                          SRCFILE(CRMDEMO/QRPGLESRC) SRCMBR(CRMSRV) +
+                          COMMIT(*NONE) OBJTYPE(*MODULE) +
+                          RPGPPOPT(*LVL2) DBGVIEW(*SOURCE) +
+                          REPLACE(*YES)
+             MONMSG     MSGID(CPF0000 SQL0000) EXEC(CALLSUBR +
+                          SUBR(FAIL))
+             CRTSRVPGM  SRVPGM(CRMDEMO/CRMSRV) MODULE(CRMDEMO/CRMSRV) +
+                          EXPORT(*ALL) ACTGRP(*CALLER) REPLACE(*YES)
+             MONMSG     MSGID(CPF0000) EXEC(CALLSUBR SUBR(FAIL))
+
+             CRTBNDDIR  BNDDIR(CRMDEMO/CRMBND) TEXT('CRM demo')
+             MONMSG     MSGID(CPF0000)
+             ADDBNDDIRE BNDDIR(CRMDEMO/CRMBND) +
+                          OBJ((CRMDEMO/CRMSRV *SRVPGM))
+             MONMSG     MSGID(CPF0000)
+
+/* ---- 4. Programs -------------------------------------------------- */
+             CHGVAR     VAR(&OBJ) VALUE('CRMPRMPT')
+             CALLSUBR   SUBR(SQLPGM)
+             CHGVAR     VAR(&OBJ) VALUE('CRMEMAIL')
+             CALLSUBR   SUBR(SQLPGM)
+             CHGVAR     VAR(&OBJ) VALUE('CRMPRT')
+             CALLSUBR   SUBR(SQLPGM)
+             CHGVAR     VAR(&OBJ) VALUE('CRMCONT')
+             CALLSUBR   SUBR(SQLPGM)
+             CHGVAR     VAR(&OBJ) VALUE('CRMACT')
+             CALLSUBR   SUBR(SQLPGM)
+             CHGVAR     VAR(&OBJ) VALUE('CRMCUSTM')
+             CALLSUBR   SUBR(SQLPGM)
+             CHGVAR     VAR(&OBJ) VALUE('CRMPIPE')
+             CALLSUBR   SUBR(SQLPGM)
+             CHGVAR     VAR(&OBJ) VALUE('CRMCUSTL')
+             CALLSUBR   SUBR(SQLPGM)
+             CHGVAR     VAR(&OBJ) VALUE('CRMDASH')
+             CALLSUBR   SUBR(SQLPGM)
+             CHGVAR     VAR(&OBJ) VALUE('CRMMENU')
+             CALLSUBR   SUBR(SQLPGM)
+
+/* ---- 5. CL program and command ------------------------------------ */
+             CHGVAR     VAR(&OBJ) VALUE('CRMC')
+             CRTBNDCL   PGM(CRMDEMO/CRMC) SRCFILE(CRMDEMO/QCLLESRC) +
+                          SRCMBR(CRMC) REPLACE(*YES)
+             MONMSG     MSGID(CPF0000) EXEC(CALLSUBR SUBR(FAIL))
+
+             CHGVAR     VAR(&OBJ) VALUE('CRM')
+             CRTCMD     CMD(CRMDEMO/CRM) PGM(CRMDEMO/CRMC) +
+                          SRCFILE(CRMDEMO/QCMDSRC) SRCMBR(CRM) +
+                          REPLACE(*YES)
+             MONMSG     MSGID(CPF0000) EXEC(CALLSUBR SUBR(FAIL))
+
+/* ---- Done ----------------------------------------------------------- */
+             IF         COND(&ERRS *GT 0) THEN(DO)
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                             MSGDTA('CRMBUILD finished with errors +
+                             in:' *BCAT &FAILED) MSGTYPE(*ESCAPE)
+             ENDDO
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('CRMBUILD complete. Run +
+                          CRMDEMO/CRM to start') MSGTYPE(*COMP)
+             RETURN
+
+/* ---- Subroutines ---------------------------------------------------- */
+             SUBR       SUBR(DSPF)
+                CRTDSPF    FILE(&LIB/&OBJ) SRCFILE(&LIB/QDDSSRC) +
+                             SRCMBR(&OBJ) RSTDSP(*YES) REPLACE(*YES)
+                MONMSG     MSGID(CPF0000) EXEC(CALLSUBR SUBR(FAIL))
+             ENDSUBR
+
+             SUBR       SUBR(SQLPGM)
+                CRTSQLRPGI OBJ(&LIB/&OBJ) SRCFILE(&LIB/QRPGLESRC) +
+                             SRCMBR(&OBJ) COMMIT(*NONE) +
+                             OBJTYPE(*PGM) RPGPPOPT(*LVL2) +
+                             DBGVIEW(*SOURCE) REPLACE(*YES)
+                MONMSG     MSGID(CPF0000 SQL0000) EXEC(CALLSUBR +
+                             SUBR(FAIL))
+             ENDSUBR
+
+             SUBR       SUBR(FAIL)
+                CHGVAR     VAR(&ERRS) VALUE(&ERRS + 1)
+                CHGVAR     VAR(&FAILED) VALUE(&FAILED *BCAT &OBJ)
+             ENDSUBR
+
+             ENDPGM

@@ -1,0 +1,96 @@
+     A* CRMCONTD - Contacts for a customer (24 x 80)
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      CA03
+     A                                      CF05
+     A                                      CF06
+     A                                      CF10
+     A                                      CA12
+     A*
+     A          R CONTSFL                   SFL
+     A            SOPT           1A  B  8  3
+     A  50                                  DSPATR(RI PC)
+     A            SCONTID        9S 0H
+     A            SNAME         30A  O  8  6
+     A            SCTITLE       22A  O  8 37
+     A            SPHONE        15A  O  8 60
+     A            SPRIM          1A  O  8 77COLOR(YLW)
+     A            SEMAIL        60A  O  9  8COLOR(TRQ)
+     A*
+     A          R CONTCTL                   SFLCTL(CONTSFL)
+     A                                      SFLSIZ(999)
+     A                                      SFLPAG(6)
+     A                                      OVERLAY
+     A  30                                  SFLDSP
+     A  31                                  SFLDSPCTL
+     A  32                                  SFLCLR
+     A  33                                  SFLEND(*MORE)
+     A                                  1  2'CRMCONT'
+     A                                      COLOR(BLU)
+     A                                  1 36'Contacts'
+     A                                      DSPATR(HI)
+     A                                  1 70DATE(*JOB *YY)
+     A                                      EDTCDE(Y)
+     A                                  2  2'Customer:'
+     A            CCUSTID        7Y 0O  2 12EDTCDE(Z)
+     A            CCUSTNM       40A  O  2 20DSPATR(HI)
+     A                                  2 70TIME
+     A                                  4  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  5  3'2=Change  4=Delete  9=Send email'
+     A                                      COLOR(BLU)
+     A                                  7  2'Opt'
+     A                                      COLOR(WHT)
+     A                                  7  6'Name / Email'
+     A                                      COLOR(WHT)
+     A                                  7 37'Title'
+     A                                      COLOR(WHT)
+     A                                  7 60'Phone'
+     A                                      COLOR(WHT)
+     A                                  7 76'Pri'
+     A                                      COLOR(WHT)
+     A*
+     A          R FKEYS
+     A                                 22  2'F3=Exit  F5=Refresh  F6=Add contac-
+     A                                      t  F12=Cancel'
+     A                                      COLOR(BLU)
+     A            FMSG          78A  O 24  2COLOR(WHT)
+     A*
+     A          R CONTWDW                   WINDOW(4 2 13 74)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A            WTITLE        40A  O  1  2DSPATR(HI)
+     A                                  3  2'First name'
+     A            WFIRST        20A  B  3 13
+     A                                      CHECK(LC)
+     A  51                                  DSPATR(RI PC)
+     A                                  4  2'Last name'
+     A            WLAST         25A  B  4 13
+     A                                      CHECK(LC)
+     A  52                                  DSPATR(RI PC)
+     A                                  5  2'Title'
+     A            WCTITLE       30A  B  5 13
+     A                                      CHECK(LC)
+     A                                  6  2'Phone'
+     A            WPHONE        15A  B  6 13
+     A                                  7  2'Email'
+     A            WEMAIL        60A  B  7 13
+     A                                      CHECK(LC)
+     A  53                                  DSPATR(RI PC)
+     A                                  8  2'Primary'
+     A            WPRIM          1A  B  8 13
+     A  54                                  DSPATR(RI PC)
+     A                                  8 16'(Y/N)'
+     A                                 10  2'Enter=Save    F12=Cancel'
+     A                                      COLOR(BLU)
+     A            WMSG          70A  O 11  2COLOR(WHT)
+     A*
+     A          R CONFWDW                   WINDOW(8 12 7 54)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A                                      WDWTITLE((*TEXT 'Confirm delete')  -
+     A                                      (*COLOR WHT))
+     A            WTEXT1        50A  O  2  2DSPATR(HI)
+     A            WTEXT2        50A  O  3  2
+     A                                  5  2'F10=Delete    F12=Cancel'
+     A                                      COLOR(BLU)

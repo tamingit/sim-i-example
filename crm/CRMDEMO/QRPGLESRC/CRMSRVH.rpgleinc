@@ -1,0 +1,129 @@
+**FREE
+// ===================================================================
+// CRMSRVH - Shared definitions for the CRM demo
+//   - AID key constants (from the workstation INFDS, position 369)
+//   - Program status data structure (current user, exception id)
+//   - Prototypes for the CRMSRV service program
+//   - Prototypes for calling the CRM programs
+// ===================================================================
+/if defined(CRMSRVH)
+/eof
+/endif
+/define CRMSRVH
+
+// --- AID byte values -------------------------------------------------
+dcl-c KEY_F03    x'33';
+dcl-c KEY_F04    x'34';
+dcl-c KEY_F05    x'35';
+dcl-c KEY_F06    x'36';
+dcl-c KEY_F07    x'37';
+dcl-c KEY_F08    x'38';
+dcl-c KEY_F09    x'39';
+dcl-c KEY_F10    x'3A';
+dcl-c KEY_F11    x'3B';
+dcl-c KEY_F12    x'3C';
+dcl-c KEY_F21    x'B9';
+dcl-c KEY_ENTER  x'F1';
+
+// --- Null date used for "no date" ------------------------------------
+dcl-c NO_DATE    d'0001-01-01';
+
+// --- Program status data structure -----------------------------------
+dcl-ds crmPsds psds qualified;
+  pgmName  char(10) pos(1);
+  excId    char(7)  pos(40);
+  jobName  char(10) pos(244);
+  jobUser  char(10) pos(254);
+  jobNbr   char(6)  pos(264);
+  curUser  char(10) pos(358);
+end-ds;
+
+// --- CRMSRV service program ------------------------------------------
+
+// Write a row to CRMEVENT (drives the live dashboard)
+dcl-pr crm_logEvent;
+  evtType  char(8)      const;
+  custId   int(10)      const;
+  forUser  char(10)     const;
+  evtText  varchar(80)  const;
+end-pr;
+
+// Make sure the signed-on user exists in CRMUSER
+dcl-pr crm_registerUser;
+end-pr;
+
+// Description for a code (CRMCODE) or a user (type 'USER')
+dcl-pr crm_codeDesc char(30);
+  codeType char(10) const;
+  code     char(10) const;
+end-pr;
+
+// Customer name for an ID (blank when not found)
+dcl-pr crm_custName char(40);
+  custId   int(10) const;
+end-pr;
+
+// Run a CL command; returns blank or the CPF message id
+dcl-pr crm_runCmd char(7);
+  cmd      varchar(3000) const;
+end-pr;
+
+// Date as MM/DD/YYYY, blank for 0001-01-01
+dcl-pr crm_fmtDate char(10);
+  inDate   date const;
+end-pr;
+
+// Parse MM/DD/YYYY, MMDDYYYY or YYYY-MM-DD. Blank gives 0001-01-01.
+// Returns *off when the text is not a valid date.
+dcl-pr crm_parseDate ind;
+  text     char(10) const;
+  outDate  date;
+end-pr;
+
+// Double up apostrophes for use inside a quoted CL string
+dcl-pr crm_quote varchar(3000);
+  text     varchar(3000) const;
+end-pr;
+
+// --- CRM programs ----------------------------------------------------
+dcl-pr CRMCUSTL extpgm('CRMCUSTL');
+end-pr;
+
+dcl-pr CRMCUSTM extpgm('CRMCUSTM');
+  mode     char(1) const;            // A=Add  C=Change  D=Display
+  custId   int(10) const;
+end-pr;
+
+dcl-pr CRMCONT extpgm('CRMCONT');
+  custId   int(10) const;
+end-pr;
+
+dcl-pr CRMACT extpgm('CRMACT');
+  custId   int(10) const;            // 0 = my open tasks
+end-pr;
+
+dcl-pr CRMPIPE extpgm('CRMPIPE');
+  custId   int(10) const;            // 0 = all customers
+end-pr;
+
+dcl-pr CRMDASH extpgm('CRMDASH');
+end-pr;
+
+dcl-pr CRMEMAIL extpgm('CRMEMAIL');
+  toAddr   char(60) const;
+  toName   char(40) const;
+  custId   int(10)  const;
+  contId   int(10)  const;
+  rtnMsg   char(78);
+end-pr;
+
+dcl-pr CRMPRT extpgm('CRMPRT');
+  report   char(1) const;            // 1=Customers  2=Pipeline
+  interact char(1) const;            // Y=show the options window
+  rtnMsg   char(78);
+end-pr;
+
+dcl-pr CRMPRMPT extpgm('CRMPRMPT');
+  codeType char(10) const;
+  code     char(10);
+end-pr;

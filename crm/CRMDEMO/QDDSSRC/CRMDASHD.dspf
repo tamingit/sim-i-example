@@ -1,0 +1,153 @@
+     A* CRMDASHD - Live dashboard (27 x 132)
+     A* Create with WAITRCD(2): the program WRITEs DASH (INVITE) and READs
+     A* the file. If no key is pressed within 2 seconds the READ times
+     A* out (status 1331) and the program refreshes the data.
+     A* Lines 9-14 and 17-25 carry embedded 5250 color attributes.
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      INDARA
+     A                                      CA03
+     A                                      CF05
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A*
+     A          R DASH                      INVITE
+     A  80                                  PUTOVR
+     A  80                                  OVERLAY
+     A  71                                  ALARM
+     A                                  1  2'CRMDASH'
+     A                                      COLOR(BLU)
+     A                                  1 50'CRM Demo - Live Dashboard'
+     A                                      DSPATR(HI)
+     A                                  1 80'* LIVE *'
+     A                                      COLOR(GRN)
+     A                                      DSPATR(BL)
+     A                                  1100'User:'
+     A            DUSER         10A  O  1106
+     A            DUSERNM       16A  O  1117
+     A                                  2100'Updated:'
+     A            DTIME          8A  O  2109
+     A                                      OVRDTA
+     A            DDATE         10A  O  2118
+     A                                      OVRDTA
+     A*
+     A                                  3  2'Customers'
+     A                                      COLOR(WHT)
+     A                                  3 34'Open pipeline'
+     A                                      COLOR(WHT)
+     A                                  3 66'Forecast'
+     A                                      COLOR(WHT)
+     A                                  3 98'My tasks'
+     A                                      COLOR(WHT)
+     A                                  4  4'Active'
+     A            KACT           5Y 0O  4 20EDTCDE(3)
+     A                                      OVRDTA
+     A                                  4 36'Open deals'
+     A            KDEALS         5Y 0O  4 57EDTCDE(3)
+     A                                      OVRDTA
+     A                                  4 68'Weighted'
+     A            KWGT          11Y 0O  4 82EDTCDE(1)
+     A                                      OVRDTA
+     A                                  4100'Open'
+     A            KTASKS         5Y 0O  4116EDTCDE(3)
+     A                                      OVRDTA
+     A                                  5  4'Prospects'
+     A            KPROS          5Y 0O  5 20EDTCDE(3)
+     A                                      OVRDTA
+     A                                  5 36'Total value'
+     A            KVALUE        11Y 0O  5 48EDTCDE(1)
+     A                                      OVRDTA
+     A                                  5 68'Won (30 days)'
+     A            KWON          11Y 0O  5 82EDTCDE(1)
+     A                                      OVRDTA
+     A                                      COLOR(GRN)
+     A                                  5100'Overdue'
+     A            KOVER          5Y 0O  5116EDTCDE(3)
+     A                                      OVRDTA
+     A                                      OVRATR
+     A  61                                  COLOR(RED)
+     A                                  6  4'Inactive'
+     A            KINACT         5Y 0O  6 20EDTCDE(3)
+     A                                      OVRDTA
+     A                                  6 36'Average deal'
+     A            KAVG          11Y 0O  6 48EDTCDE(1)
+     A                                      OVRDTA
+     A                                  6 68'Lost (30 days)'
+     A            KLOST         11Y 0O  6 82EDTCDE(1)
+     A                                      OVRDTA
+     A                                      COLOR(PNK)
+     A                                  6100'Due today'
+     A            KTODAY         5Y 0O  6116EDTCDE(3)
+     A                                      OVRDTA
+     A                                      OVRATR
+     A  62                                  COLOR(YLW)
+     A*
+     A                                  8  2'Pipeline by stage (open deals, plu-
+     A                                      s won/lost in the last 30 days)'
+     A                                      COLOR(WHT)
+     A            BAR1         128A  O  9  3
+     A                                      OVRDTA
+     A            BAR2         128A  O 10  3
+     A                                      OVRDTA
+     A            BAR3         128A  O 11  3
+     A                                      OVRDTA
+     A            BAR4         128A  O 12  3
+     A                                      OVRDTA
+     A            BAR5         128A  O 13  3
+     A                                      OVRDTA
+     A            BAR6         128A  O 14  3
+     A                                      OVRDTA
+     A*
+     A                                 16  2'My open tasks (red = overdue, yell-
+     A                                      ow = due today)'
+     A                                      COLOR(WHT)
+     A                                 16 68'Live activity feed - all users (wh-
+     A                                      ite = new)'
+     A                                      COLOR(WHT)
+     A            TSK1          64A  O 17  2
+     A                                      OVRDTA
+     A            TSK2          64A  O 18  2
+     A                                      OVRDTA
+     A            TSK3          64A  O 19  2
+     A                                      OVRDTA
+     A            TSK4          64A  O 20  2
+     A                                      OVRDTA
+     A            TSK5          64A  O 21  2
+     A                                      OVRDTA
+     A            TSK6          64A  O 22  2
+     A                                      OVRDTA
+     A            TSK7          64A  O 23  2
+     A                                      OVRDTA
+     A            TSK8          64A  O 24  2
+     A                                      OVRDTA
+     A            TSK9          64A  O 25  2
+     A                                      OVRDTA
+     A            FEED1         63A  O 17 68
+     A                                      OVRDTA
+     A            FEED2         63A  O 18 68
+     A                                      OVRDTA
+     A            FEED3         63A  O 19 68
+     A                                      OVRDTA
+     A            FEED4         63A  O 20 68
+     A                                      OVRDTA
+     A            FEED5         63A  O 21 68
+     A                                      OVRDTA
+     A            FEED6         63A  O 22 68
+     A                                      OVRDTA
+     A            FEED7         63A  O 23 68
+     A                                      OVRDTA
+     A            FEED8         63A  O 24 68
+     A                                      OVRDTA
+     A            FEED9         63A  O 25 68
+     A                                      OVRDTA
+     A*
+     A            DALERT       128A  O 26  2
+     A                                      OVRDTA
+     A                                      OVRATR
+     A  70                                  DSPATR(RI)
+     A                                      COLOR(YLW)
+     A                                 27  2'F3=Exit  F5=Refresh  F7=My tasks  -
+     A                                      F8=Pipeline  F9=Customers'
+     A                                      COLOR(BLU)
+     A            DSTAT         60A  O 27 70COLOR(BLU)
+     A                                      OVRDTA

@@ -1,0 +1,146 @@
+     A* CRMPIPED - Sales pipeline board (27 x 132)
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      INDARA
+     A                                      CA03
+     A                                      CF05
+     A                                      CF06
+     A                                      CF10
+     A                                      CF11
+     A                                      CA12
+     A                                      CF21
+     A*
+     A          R OPPSFL                    SFL
+     A            SOPT           1A  B 11  2
+     A  50                                  DSPATR(RI PC)
+     A            SCUSTID        9S 0H
+     A            SOPPID         7Y 0O 11  4EDTCDE(Z)
+     A            SCUST         26A  O 11 12
+     A            SOPP          28A  O 11 39
+     A            SSTAGE        11A  O 11 68
+     A  63                                  COLOR(GRN)
+     A  64                                  COLOR(PNK)
+     A            SAMT           9Y 0O 11 80EDTCDE(1)
+     A            SPROB          3Y 0O 11 92EDTCDE(3)
+     A                                 11 95'%'
+     A            SWGT           9Y 0O 11 97EDTCDE(1)
+     A            SCLOSE        10A  O 11109
+     A  61                                  COLOR(RED)
+     A            SOWNER        10A  O 11120
+     A  62                                  COLOR(WHT)
+     A*
+     A          R OPPCTL                    SFLCTL(OPPSFL)
+     A                                      SFLSIZ(9999)
+     A                                      SFLPAG(14)
+     A                                      OVERLAY
+     A  30                                  SFLDSP
+     A  31                                  SFLDSPCTL
+     A  32                                  SFLCLR
+     A  33                                  SFLEND(*MORE)
+     A                                  1  2'CRMPIPE'
+     A                                      COLOR(BLU)
+     A                                  1 58'Sales Pipeline'
+     A                                      DSPATR(HI)
+     A                                  1110'User:'
+     A            CUSER         10A  O  1116
+     A                                  2  2'Owner'
+     A            COWNER        10A  B  2  8
+     A  51                                  DSPATR(RI PC)
+     A                                  2 20'(blank=all)'
+     A                                  2 33'Customer'
+     A            CCUSTID        7Y 0B  2 42EDTCDE(Z)
+     A  52                                  DSPATR(RI PC)
+     A            CCUSTNM       30A  O  2 51
+     A                                  2 83'Show closed'
+     A            CCLOSED        1A  B  2 95
+     A  53                                  DSPATR(RI PC)
+     A                                  2 97'(Y/N)'
+     A                                  2110DATE(*JOB *YY)
+     A                                      EDTCDE(Y)
+     A                                  2122TIME
+     A                                  4  2'Pipeline by stage'
+     A                                      COLOR(WHT)
+     A            CSUM1        128A  O  5  3COLOR(TRQ)
+     A            CSUM2        128A  O  6  3
+     A            CSUM3        128A  O  7  3COLOR(WHT)
+     A                                  8  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  8 30'2=Change  3=Advance stage  4=Delet-
+     A                                      e  5=Customer  7=Activities'
+     A                                      COLOR(BLU)
+     A                                 10  1'Opt'
+     A                                      COLOR(WHT)
+     A                                 10  4'Opp #'
+     A                                      COLOR(WHT)
+     A                                 10 12'Customer'
+     A                                      COLOR(WHT)
+     A                                 10 39'Opportunity'
+     A                                      COLOR(WHT)
+     A                                 10 68'Stage'
+     A                                      COLOR(WHT)
+     A                                 10 85'Amount'
+     A                                      COLOR(WHT)
+     A                                 10 92'Prob'
+     A                                      COLOR(WHT)
+     A                                 10 99'Weighted'
+     A                                      COLOR(WHT)
+     A                                 10109'Close date'
+     A                                      COLOR(WHT)
+     A                                 10120'Owner'
+     A                                      COLOR(WHT)
+     A*
+     A          R FKEYS
+     A                                 26  2'F3=Exit  F5=Refresh  F6=Add opport-
+     A                                      unity  F11=Show/hide closed  F12=Ca-
+     A                                      ncel  F21=Print pipeline report'
+     A                                      COLOR(BLU)
+     A            FMSG         128A  O 27  2COLOR(WHT)
+     A*
+     A          R OPPWDW                    WINDOW(8 30 12 70)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A            WTITLE        40A  O  1  2DSPATR(HI)
+     A                                  2  2'Customer'
+     A            WCUST          7Y 0B  2 15EDTCDE(Z)
+     A  41                                  DSPATR(PR)
+     A  51                                  DSPATR(RI PC)
+     A            WCUSTNM       40A  O  2 24
+     A                                  3  2'Opportunity'
+     A            WOPP          40A  B  3 15
+     A                                      CHECK(LC)
+     A  52                                  DSPATR(RI PC)
+     A                                  4  2'Stage'
+     A            WSTAGE         1A  B  4 15
+     A  53                                  DSPATR(RI PC)
+     A                                  4 18'1=Lead 2=Qualified 3=Proposal 4=Ne-
+     A                                      gotiation'
+     A                                      COLOR(BLU)
+     A                                  5 18'5=Won 6=Lost'
+     A                                      COLOR(BLU)
+     A                                  6  2'Amount'
+     A            WAMT          11Y 2B  6 15EDTCDE(1)
+     A  54                                  DSPATR(RI PC)
+     A                                  7  2'Probability'
+     A            WPROB          3Y 0B  7 15EDTCDE(3)
+     A  55                                  DSPATR(RI PC)
+     A                                  7 20'% (0 = default for the stage)'
+     A                                  8  2'Close date'
+     A            WCLOSE        10A  B  8 15
+     A  56                                  DSPATR(RI PC)
+     A                                  8 27'(MM/DD/YYYY)'
+     A                                  9  2'Owner'
+     A            WOWNER        10A  B  9 15
+     A  57                                  DSPATR(RI PC)
+     A            WOWNNM        30A  O  9 27
+     A                                 10  2'Enter=Save    F12=Cancel'
+     A                                      COLOR(BLU)
+     A            WMSG          66A  O 11  2COLOR(WHT)
+     A*
+     A          R CONFWDW                   WINDOW(10 40 7 54)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A                                      WDWTITLE((*TEXT 'Confirm delete')  -
+     A                                      (*COLOR WHT))
+     A            WTEXT1        50A  O  2  2DSPATR(HI)
+     A            WTEXT2        50A  O  3  2
+     A                                  5  2'F10=Delete    F12=Cancel'
+     A                                      COLOR(BLU)

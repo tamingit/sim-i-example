@@ -1,0 +1,39 @@
+/* ================================================================ */
+/* CRMC - Command processing program for command CRM               */
+/*   CRMDEMO/CRM            main menu                               */
+/*   CRMDEMO/CRM *DASH      live dashboard     (27 x 132 session)   */
+/*   CRMDEMO/CRM *PIPE      sales pipeline     (27 x 132 session)   */
+/*   CRMDEMO/CRM *CUST      customer list                           */
+/*   CRMDEMO/CRM *TASKS     my open tasks                           */
+/*   CRMDEMO/CRM *PRINT     print a report                          */
+/* ================================================================ */
+             PGM        PARM(&START)
+
+             DCL        VAR(&START) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&CUST) TYPE(*INT) LEN(4) VALUE(0)
+             DCL        VAR(&RPT) TYPE(*CHAR) LEN(1) VALUE('1')
+             DCL        VAR(&YES) TYPE(*CHAR) LEN(1) VALUE('Y')
+             DCL        VAR(&MSG) TYPE(*CHAR) LEN(78)
+
+             ADDLIBLE   LIB(CRMDEMO) POSITION(*LAST)
+             MONMSG     MSGID(CPF2103)
+
+             SELECT
+             WHEN       COND(&START *EQ '*DASH') THEN(CALL +
+                          PGM(CRMDASH))
+             WHEN       COND(&START *EQ '*PIPE') THEN(CALL +
+                          PGM(CRMPIPE) PARM(&CUST))
+             WHEN       COND(&START *EQ '*CUST') THEN(CALL +
+                          PGM(CRMCUSTL))
+             WHEN       COND(&START *EQ '*TASKS') THEN(CALL +
+                          PGM(CRMACT) PARM(&CUST))
+             WHEN       COND(&START *EQ '*PRINT') THEN(DO)
+                CALL       PGM(CRMPRT) PARM(&RPT &YES &MSG)
+                IF         COND(&MSG *NE ' ') THEN(SNDPGMMSG +
+                             MSGID(CPF9898) MSGF(QCPFMSG) +
+                             MSGDTA(&MSG) MSGTYPE(*COMP))
+             ENDDO
+             OTHERWISE  CMD(CALL PGM(CRMMENU))
+             ENDSELECT
+
+             ENDPGM

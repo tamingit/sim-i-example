@@ -1,0 +1,109 @@
+     A* CRMCUSTMD - Customer maintenance (24 x 80)
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      CA03
+     A                                      CF04
+     A                                      CF05
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF10
+     A                                      CA12
+     A*
+     A          R DETAIL
+     A                                      RTNCSRLOC(&CSRRCD &CSRFLD)
+     A            CSRRCD        10A  H
+     A            CSRFLD        10A  H
+     A                                  1  2'CRMCUSTM'
+     A                                      COLOR(BLU)
+     A            DTITLE        40A  O  1 22DSPATR(HI)
+     A                                  1 70DATE(*JOB *YY)
+     A                                      EDTCDE(Y)
+     A                                  2  2'User:'
+     A            DUSER         10A  O  2  8
+     A                                  2 70TIME
+     A                                  3  2'Customer ID . . . :'
+     A            DCUSTID        7Y 0O  3 22EDTCDE(Z)
+     A                                  3 31'Created'
+     A            DCRTINFO      38A  O  3 39
+     A                                  5  2'Name  . . . . . . :'
+     A            DNAME         40A  B  5 22
+     A                                      CHECK(LC)
+     A  40                                  DSPATR(PR)
+     A  51                                  DSPATR(RI PC)
+     A                                  6  2'Status  . . . . . :'
+     A            DSTATUS        1A  B  6 22
+     A  40                                  DSPATR(PR)
+     A  52                                  DSPATR(RI PC)
+     A            DSTSDESC      30A  O  6 26
+     A                                  7  2'Industry  . . . . :'
+     A            DINDUS        10A  B  7 22
+     A  40                                  DSPATR(PR)
+     A  53                                  DSPATR(RI PC)
+     A            DINDDESC      30A  O  7 34
+     A                                  8  2'Address . . . . . :'
+     A            DADDR1        40A  B  8 22
+     A                                      CHECK(LC)
+     A  40                                  DSPATR(PR)
+     A                                  9  2'City / State / Zip:'
+     A            DCITY         25A  B  9 22
+     A                                      CHECK(LC)
+     A  40                                  DSPATR(PR)
+     A            DSTATE         2A  B  9 49
+     A  40                                  DSPATR(PR)
+     A            DZIP          10A  B  9 53
+     A  40                                  DSPATR(PR)
+     A                                 10  2'Phone . . . . . . :'
+     A            DPHONE        15A  B 10 22
+     A  40                                  DSPATR(PR)
+     A                                 11  2'Website . . . . . :'
+     A            DWEBSITE      40A  B 11 22
+     A                                      CHECK(LC)
+     A  40                                  DSPATR(PR)
+     A                                 12  2'Owner . . . . . . :'
+     A            DOWNER        10A  B 12 22
+     A  40                                  DSPATR(PR)
+     A  54                                  DSPATR(RI PC)
+     A            DOWNNAME      30A  O 12 34
+     A                                 14  2'Account summary'
+     A                                      COLOR(WHT)
+     A                                 15  4'Contacts . . . . :'
+     A            DCONTCNT       5Y 0O 15 23EDTCDE(3)
+     A                                 15 30'Primary:'
+     A            DPRIMARY      40A  O 15 39
+     A                                 16  4'Open deals . . . :'
+     A            DOPPCNT        5Y 0O 16 23EDTCDE(3)
+     A                                 16 30'Value:'
+     A            DOPPAMT       13Y 2O 16 39EDTCDE(1)
+     A                                 17  4'Open tasks . . . :'
+     A            DTASKCNT       5Y 0O 17 23EDTCDE(3)
+     A                                 17 30'Overdue:'
+     A            DTASKOVR       5Y 0O 17 39EDTCDE(3)
+     A  60                                  COLOR(RED)
+     A                                 18  4'Last activity  . :'
+     A            DLASTACT      55A  O 18 23
+     A                                 20  2'Last changed'
+     A            DCHGINFO      50A  O 20 15
+     A                                 22  2'F3=Exit  F4=Prompt  F5=Reload  F7=-
+     A                                      Activities  F8=Contacts'
+     A                                      COLOR(BLU)
+     A                                 23  2'F9=Email primary contact  F12=Canc-
+     A                                      el  Enter=Save'
+     A                                      COLOR(BLU)
+     A            DMSG          78A  O 24  2COLOR(WHT)
+     A*
+     A          R CNFLWDW                   WINDOW(6 8 9 62)
+     A                                      WDWBORDER((*COLOR RED) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A                                      WDWTITLE((*TEXT 'Changed by        -
+     A                                      another user') (*COLOR WHT))
+     A                                  2  2'This customer was changed in anoth-
+     A                                      er session'
+     A                                  3  2'after you started editing it:'
+     A            CFINFO        56A  O  4  4DSPATR(HI)
+     A                                  6  2'F5=Load their version (discard my -
+     A                                      changes)'
+     A                                      COLOR(BLU)
+     A                                  7  2'F10=Save mine anyway    F12=Back t-
+     A                                      o editing'
+     A                                      COLOR(BLU)

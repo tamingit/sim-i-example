@@ -1,0 +1,135 @@
+     A* CRMACTD - Activities for a customer / my open tasks (24 x 80)
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      CA03
+     A                                      CF04
+     A                                      CF05
+     A                                      CF06
+     A                                      CF10
+     A                                      CF11
+     A                                      CA12
+     A*
+     A          R ACTSFL                    SFL
+     A            SOPT           1A  B  8  3
+     A  50                                  DSPATR(RI PC)
+     A            SACTID         9S 0H
+     A            SDATE         10A  O  8  6
+     A  61                                  COLOR(RED)
+     A  62                                  COLOR(YLW)
+     A            STYPE          5A  O  8 17
+     A            SSUBJ         30A  O  8 23
+     A            SASSIGN       10A  O  8 54
+     A  63                                  COLOR(WHT)
+     A            SCUST         12A  O  8 65
+     A            SDONE          1A  O  8 78
+     A*
+     A          R ACTCTL                    SFLCTL(ACTSFL)
+     A                                      SFLSIZ(9999)
+     A                                      SFLPAG(14)
+     A                                      OVERLAY
+     A  30                                  SFLDSP
+     A  31                                  SFLDSPCTL
+     A  32                                  SFLCLR
+     A  33                                  SFLEND(*MORE)
+     A                                  1  2'CRMACT'
+     A                                      COLOR(BLU)
+     A            CTITLE        40A  O  1 22DSPATR(HI)
+     A                                  1 70DATE(*JOB *YY)
+     A                                      EDTCDE(Y)
+     A            CINFO         66A  O  2  2
+     A                                  2 70TIME
+     A                                  3  2'Showing:'
+     A            CSHOW         50A  O  3 11COLOR(WHT)
+     A                                  4  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  5  3'2=Change  4=Delete  5=Display  6=C-
+     A                                      omplete'
+     A                                      COLOR(BLU)
+     A                                  7  2'Opt'
+     A                                      COLOR(WHT)
+     A                                  7  6'Date'
+     A                                      COLOR(WHT)
+     A                                  7 17'Type'
+     A                                      COLOR(WHT)
+     A                                  7 23'Subject'
+     A                                      COLOR(WHT)
+     A                                  7 54'Assigned'
+     A                                      COLOR(WHT)
+     A                                  7 65'Customer'
+     A                                      COLOR(WHT)
+     A                                  7 76'Done'
+     A                                      COLOR(WHT)
+     A*
+     A          R FKEYS
+     A                                 22  2'F3=Exit  F5=Refresh  F6=Add  F10=O-
+     A                                      pen/All  F11=Mine/Everyone  F12=Can-
+     A                                      cel'
+     A                                      COLOR(BLU)
+     A            FMSG          78A  O 23  2COLOR(WHT)
+     A*
+     A          R ACTWDW                    WINDOW(3 2 16 74)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A                                      RTNCSRLOC(&CSRRCD &CSRFLD)
+     A            CSRRCD        10A  H
+     A            CSRFLD        10A  H
+     A            WTITLE        40A  O  1  2DSPATR(HI)
+     A                                  3  2'Customer'
+     A            WCUST          7Y 0B  3 13EDTCDE(Z)
+     A  41                                  DSPATR(PR)
+     A  57                                  DSPATR(RI PC)
+     A            WCUSTNM       40A  O  3 22
+     A                                  4  2'Type'
+     A            WTYPE          5A  B  4 13
+     A  40                                  DSPATR(PR)
+     A  51                                  DSPATR(RI PC)
+     A            WTYPED        30A  O  4 20
+     A                                  5  2'Subject'
+     A            WSUBJ         50A  B  5 13
+     A                                      CHECK(LC)
+     A  40                                  DSPATR(PR)
+     A  52                                  DSPATR(RI PC)
+     A                                  6  2'Notes'
+     A            WNOTE1        60A  B  6 13
+     A                                      CHECK(LC)
+     A  40                                  DSPATR(PR)
+     A            WNOTE2        60A  B  7 13
+     A                                      CHECK(LC)
+     A  40                                  DSPATR(PR)
+     A            WNOTE3        60A  B  8 13
+     A                                      CHECK(LC)
+     A  40                                  DSPATR(PR)
+     A                                  9  2'Due date'
+     A            WDUE          10A  B  9 13
+     A  40                                  DSPATR(PR)
+     A  53                                  DSPATR(RI PC)
+     A                                  9 25'(MM/DD/YYYY, blank = none)'
+     A                                 10  2'Priority'
+     A            WPRI           1A  B 10 13
+     A  40                                  DSPATR(PR)
+     A  54                                  DSPATR(RI PC)
+     A                                 10 25'(H/M/L)'
+     A                                 11  2'Assign to'
+     A            WASSIGN       10A  B 11 13
+     A  40                                  DSPATR(PR)
+     A  55                                  DSPATR(RI PC)
+     A            WASSNM        30A  O 11 25
+     A                                 12  2'Done'
+     A            WDONE          1A  B 12 13
+     A  40                                  DSPATR(PR)
+     A  56                                  DSPATR(RI PC)
+     A                                 12 25'(Y/N)'
+     A                                 14  2'F4=Prompt    Enter=Save    F12=Can-
+     A                                      cel'
+     A                                      COLOR(BLU)
+     A            WMSG          70A  O 15  2COLOR(WHT)
+     A*
+     A          R CONFWDW                   WINDOW(8 12 7 54)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR    -
+     A                                      RI) (*CHAR '        '))
+     A                                      WDWTITLE((*TEXT 'Confirm delete')  -
+     A                                      (*COLOR WHT))
+     A            WTEXT1        50A  O  2  2DSPATR(HI)
+     A            WTEXT2        50A  O  3  2
+     A                                  5  2'F10=Delete    F12=Cancel'
+     A                                      COLOR(BLU)
