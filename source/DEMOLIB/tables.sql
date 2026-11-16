@@ -1,4 +1,4 @@
--- The demo's table, written as it would be for Db2 for i. The fake translates it for SQLite:
+-- The demo's table, written as it would be for Db2 for i. Sim i translates it for SQLite:
 -- the library goes, as do FOR COLUMN and WITH DEFAULT's Db2 spelling.
 create or replace table demolib.customer (
   id integer not null primary key,
