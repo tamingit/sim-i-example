@@ -117,6 +117,8 @@ services:
               "--disable-workspace-trust", "/source"]
     environment:
       SIM_I_DEVELOPER_USER: ${SIM_I_DEVELOPER_USER}
+      # The site's address in the browser: the extension opens the terminal there.
+      SIM_I_PUBLIC_URL: ${SIM_I_PUBLIC_URL:-http://localhost:8080}
       SIM_I_GIT_NAME: ${SIM_I_GIT_NAME:-}
       SIM_I_GIT_EMAIL: ${SIM_I_GIT_EMAIL:-}
       # git over SSH with the key SIM_I_GIT_SSH_KEY names (none: no key), trusting a host's key the first time.
@@ -140,9 +142,9 @@ services:
       ASPNETCORE_HTTP_PORTS: "8080"
       Server__StaticDir: /app/wwwroot
       Data__DbPath: /app/data/greenglow.db
-      # The address the browser uses (an origin, no path), which GreenGlow checks requests' origin against.
-      Server__PublicUrl: ${SIM_I_PUBLIC_URL:-http://localhost:8080}
-      # TODO: GreenGlow's base-path setting, once it has one: /terminal.
+      # Where the browser reaches GreenGlow: the site's address and /terminal. GreenGlow checks requests' origin against
+      # it and serves under its path (its pages, redirects and cookie), so it must match the proxy's route.
+      Server__PublicUrl: ${SIM_I_PUBLIC_URL:-http://localhost:8080}/terminal
       Server__TrustForwardedHeaders: "true"
       # First start only: sign-in with Sim i's users, and the break-glass administrator's password.
       Setup__Method: ibmi
