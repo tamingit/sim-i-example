@@ -12,7 +12,7 @@ Then open <http://localhost:8080> and sign on as `DEV` / `ChangeMe!` (set in `.e
 
 | Where | What |
 |---|---|
-| <http://localhost:8080/> | Sim i's web interface: source members, receiving from an IBM i, profiles. For the `SIMADMIN` group's members, which `DEV` is in; anyone else who signs on is sent to the terminal. |
+| <http://localhost:8080/> | Sim i's launchpad: Code, Terminal, the source editor, Profiles and Receive from an IBM i, each opening in a tab of its own. For the `SIMADMIN` group's members, which `DEV` is in; anyone else who signs on is sent to the terminal. |
 | <http://localhost:8080/code/> | code-server (VS Code) on `source/`, for `DEV` only. Saving a member compiles it on Sim i; the first save asks for `DEV`'s password. F5 on an RPG member debugs it. |
 | <http://localhost:8080/terminal/> | GreenGlow Connect: 5250 sessions on Sim i, signing on with Sim i's users. |
 | `localhost:2323` | Any TN5250 client. Try `CALL DEMOCUST/CUSTMNT`, `CALL DEMOLIB/HELLO`, or the CRM in `source/CRMDEMO` (see its README). |
