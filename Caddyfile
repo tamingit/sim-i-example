@@ -1,0 +1,32 @@
+# The one web address for Sim i, code-server and GreenGlow (compose.yml's proxy service).
+#   /            Sim i's web interface: the administrators' group's members (others are sent to /terminal/)
+#   /code/       code-server, for the developer only: Sim i's gate decides each request from its sign-on cookie
+#   /terminal/   GreenGlow, which signs people on itself, against Sim i's users
+# SIM_I_SITE is the address the proxy serves: ":8080" for plain HTTP (the default), or a host name for HTTPS
+# with a certificate Caddy gets itself (publish 80 and 443 instead: see compose.yaml).
+
+{
+	admin off
+}
+
+{$SIM_I_SITE} {
+	# code-server: forward_auth asks Sim i first, passing the browser's cookie. Sim i answers 204 for the developer, a
+	# redirect to its sign-on page (and back) for anyone not signed on, and 403 for everyone else. code-server is
+	# served under /code/ with the prefix taken off, which it supports.
+	redir /code /code/ 308
+	route /code/* {
+		forward_auth sim-i:8080 {
+			uri /api/gate/code
+		}
+		uri strip_prefix /code
+		reverse_proxy code-server:8080
+	}
+
+	# GreenGlow serves under /terminal/ itself (its base path), so the path goes to it as it is.
+	redir /terminal /terminal/ 308
+	route /terminal/* {
+		reverse_proxy greenglow:8080
+	}
+
+	reverse_proxy sim-i:8080
+}

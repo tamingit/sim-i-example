@@ -63,7 +63,7 @@ dcl-proc load;
   rrn = 0;
   pattern = '%' + %trim(filter) + '%';
   exec sql declare found cursor for
-    select id, name, city, balance from demolib/customers
+    select id, name, city, balance from democust/customers
     where upper(name) like upper(:pattern) order by name for read only;
   exec sql open found;
   exec sql fetch next from found into :id, :name, :city, :balance;
@@ -83,7 +83,7 @@ dcl-proc show;
   wanted = id;
   exec sql select name, city, email, phone, balance
     into :name, :city, :email, :phone, :balance
-    from demolib/customers where id = :wanted;
+    from democust/customers where id = :wanted;
   id = wanted;
   exfmt detail;
 end-proc;
@@ -94,7 +94,7 @@ dcl-proc printcust;
   wanted = id;
   exec sql select name, city, email, phone, balance
     into :name, :city, :email, :phone, :balance
-    from demolib/customers where id = :wanted;
+    from democust/customers where id = :wanted;
   if sqlcode <> 0;
     msg = 'Customer ' + %char(wanted) + ' was not found.';
     return;
@@ -139,7 +139,7 @@ dcl-proc lookup;
       leave;
     endif;
     id = lkid;
-    exec sql select count(*) into :rrn from demolib/customers where id = :lkid;
+    exec sql select count(*) into :rrn from democust/customers where id = :lkid;
     *in52 = (rrn = 0);
     if not *in52;
       if forprint;
@@ -170,8 +170,8 @@ dcl-proc create;
     endif;
     *in50 = (name = *blanks);
   enddo;
-  exec sql select coalesce(max(id), 0) + 1 into :newid from demolib/customers;
-  exec sql insert into demolib/customers (id, name, city, email, phone, balance)
+  exec sql select coalesce(max(id), 0) + 1 into :newid from democust/customers;
+  exec sql insert into democust/customers (id, name, city, email, phone, balance)
     values (:newid, :name, :city, :email, :phone, 0);
   if sqlcode = 0;
     msg = 'Customer ' + %char(newid) + ' created.';

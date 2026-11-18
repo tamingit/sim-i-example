@@ -1,5 +1,5 @@
 -- The customer table and 50 seeded customers, written as for Db2 for i.
-create or replace table demolib.customers (
+create or replace table democust.customers (
   id integer not null primary key,
   name varchar(30) not null with default,
   city varchar(20) not null with default,
@@ -8,7 +8,7 @@ create or replace table demolib.customers (
   balance decimal(7, 2) not null with default
 );
 
-insert into demolib.customers (id, name, city, email, phone, balance) values
+insert into democust.customers (id, name, city, email, phone, balance) values
   (1, 'Ada Lovelace', 'Rochester', 'alovelace1@example.com', '555-0100-100', -800.00),
   (2, 'Grace Dijkstra', 'Austin', 'gdijkstra2@example.com', '555-0101-103', 367.00),
   (3, 'Alan Hamilton', 'Boston', 'ahamilton3@example.com', '555-0102-107', 1534.00),

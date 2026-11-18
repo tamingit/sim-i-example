@@ -1,0 +1,179 @@
+# Sim i with the examples in ./source (DEMOLIB, DEMOCUST and CRMDEMO), a developer called DEV, code-server with
+# the Sim i extension, and GreenGlow Connect. Everything it needs is in this folder; the images come from registries.
+#
+#   docker compose up --build
+#
+# Then, at http://localhost:8080 (SIM_I_WEB_PUBLISHED_PORT in .env changes it):
+#   /            Sim i's web interface: sign on as DEV / ChangeMe!. Only the administrators' group's members
+#                (SIMADMIN, which DEV is in) use it; anyone else who signs on is sent to /terminal/.
+#   /code/       code-server on ./source, for DEV only, once signed on at /. Saving a member compiles it on Sim i.
+#   /terminal/   GreenGlow: 5250 sessions on Sim i in the browser, signing on with Sim i's users.
+# And on this machine: 5250 Telnet on 2323 (CALL DEMOCUST/CUSTMNT, or the CRM: see source/CRMDEMO/README.md), the
+# host servers on IBM's ports, the debug server on 4711 and PostgreSQL on 5432.
+#
+# code-server and GreenGlow aren't published: only the proxy reaches them. Each app has a network of its own with
+# Sim i and the proxy, so code-server can't reach PostgreSQL or GreenGlow, and GreenGlow reaches nothing else.
+# Volumes keep the database, the IFS, the TLS certificate, code-server's home and GreenGlow's data between runs;
+# docker compose down -v throws them away. Change the passwords in .env before anyone else can reach it.
+
+name: sim-i-examples
+
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: simi
+      POSTGRES_PASSWORD: ${SIM_I_DB_PASSWORD:-simi}
+      POSTGRES_DB: simi
+    networks: [database]
+    ports:
+      - "${SIM_I_HOST:-127.0.0.1}:${SIM_I_DB_PUBLISHED_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U simi -d simi"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  sim-i:
+    image: ghcr.io/tamingit/sim-i:${SIM_I_TAG:-profiling}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SIM_I_DATABASE: "Host=postgres;Database=simi;Username=simi;Password=${SIM_I_DB_PASSWORD:-simi}"
+      SIM_I_SOURCE_DIR: /source
+      # The developer, put in the administrators' group at each start: the only user code-server lets in.
+      SIM_I_DEVELOPER_USER: ${SIM_I_DEVELOPER_USER:?set SIM_I_DEVELOPER_USER in .env}
+      SIM_I_DEVELOPER_PASSWORD: ${SIM_I_DEVELOPER_PASSWORD:?set SIM_I_DEVELOPER_PASSWORD in .env}
+      SIM_I_ADMIN_GROUP: ${SIM_I_ADMIN_GROUP:-SIMADMIN}
+      # The test user, made only when .env sets SIM_I_USER.
+      SIM_I_USER: ${SIM_I_USER:-}
+      SIM_I_PASSWORD: ${SIM_I_PASSWORD:-}
+      # Where the web interface links to, on the proxy's address.
+      SIM_I_CODE_URL: /code/
+      SIM_I_TERMINAL_URL: /terminal/
+    networks: [database, web, code, terminal]
+    ports:
+      # The port mapper tells clients the ports inside the container, so they're published unchanged.
+      # The web interface (8080) isn't: it's the proxy's.
+      - "${SIM_I_HOST:-127.0.0.1}:2323:2323"     # 5250 Telnet
+      - "${SIM_I_HOST:-127.0.0.1}:992:992"       # 5250 Telnet, TLS
+      - "${SIM_I_HOST:-127.0.0.1}:449:449"       # port mapper
+      - "${SIM_I_HOST:-127.0.0.1}:8476:8476"     # sign-on
+      - "${SIM_I_HOST:-127.0.0.1}:9476:9476"
+      - "${SIM_I_HOST:-127.0.0.1}:8475:8475"     # remote command
+      - "${SIM_I_HOST:-127.0.0.1}:9475:9475"
+      - "${SIM_I_HOST:-127.0.0.1}:8474:8474"     # Network Print
+      - "${SIM_I_HOST:-127.0.0.1}:9474:9474"
+      - "${SIM_I_HOST:-127.0.0.1}:8473:8473"     # file server
+      - "${SIM_I_HOST:-127.0.0.1}:9473:9473"
+      - "${SIM_I_HOST:-127.0.0.1}:4711:4711"     # debug server, for VS Code on this machine
+    volumes:
+      - sim-i-ifs:/ifs
+      - sim-i-certs:/certs
+      - ./source:/source:ro
+
+  # The one web address. SIM_I_SITE ":8080" is plain HTTP; for HTTPS, set it to the host name and publish 80 and 443
+  # in place of the line below ("${SIM_I_HOST:-127.0.0.1}:443:443" and the same for 80).
+  proxy:
+    image: caddy:2.11.7-alpine
+    restart: unless-stopped
+    depends_on: [sim-i]
+    environment:
+      SIM_I_SITE: ${SIM_I_SITE:-:8080}
+    networks: [web, code, terminal]
+    ports:
+      - "${SIM_I_HOST:-127.0.0.1}:${SIM_I_WEB_PUBLISHED_PORT:-8080}:8080"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    read_only: true
+    tmpfs:
+      - /config
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: ["no-new-privileges:true"]
+
+  # VS Code in the browser on ./source, with Sim i's extension (from the Sim i image): saving a file compiles it on
+  # Sim i, F5 debugs it, and git works on the folder when it's a repository. No password of its own: the proxy lets
+  # in only the developer, signed on at Sim i's page, and nothing else can reach it.
+  code-server:
+    build:
+      context: ./code-server
+      # Its user takes the uid and gid that own ./source (id -u, id -g), so its files stay yours. After changing
+      # them, rebuild, and remove the sim-i-examples_code-server-home volume, which belongs to the old ones.
+      args:
+        SIM_I_IMAGE: ghcr.io/tamingit/sim-i:${SIM_I_TAG:-profiling}
+        SIM_I_UID: ${SIM_I_UID:-1000}
+        SIM_I_GID: ${SIM_I_GID:-1000}
+    restart: unless-stopped
+    depends_on: [sim-i]
+    # Workspace trust off: /source is the developer's own, and in Restricted Mode the Sim i extension wouldn't run.
+    command: ["--auth", "none", "--bind-addr", "0.0.0.0:8080", "--disable-telemetry", "--disable-update-check",
+              "--disable-workspace-trust", "/source"]
+    environment:
+      SIM_I_DEVELOPER_USER: ${SIM_I_DEVELOPER_USER}
+      SIM_I_GIT_NAME: ${SIM_I_GIT_NAME:-}
+      SIM_I_GIT_EMAIL: ${SIM_I_GIT_EMAIL:-}
+      # git over SSH with the key SIM_I_GIT_SSH_KEY names (none: no key), trusting a host's key the first time.
+      GIT_SSH_COMMAND: "ssh -i /run/secrets/git-ssh-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+    networks: [code]
+    volumes:
+      - ./source:/source
+      # The key file must be readable by SIM_I_UID and by nobody else (chmod 600).
+      - ${SIM_I_GIT_SSH_KEY:-/dev/null}:/run/secrets/git-ssh-key:ro
+      # Its settings, extensions, git configuration and known hosts.
+      - code-server-home:/home/coder
+
+  # GreenGlow Connect, signing people on with Sim i's users (Setup__Method ibmi); the administrators' group's members
+  # are its administrators too. GREENGLOW_TAG picks the image: one that can serve under /terminal/.
+  greenglow:
+    image: ghcr.io/tamingit/greenglow:${GREENGLOW_TAG:-beta}
+    restart: unless-stopped
+    init: true
+    depends_on: [sim-i]
+    environment:
+      ASPNETCORE_HTTP_PORTS: "8080"
+      Server__StaticDir: /app/wwwroot
+      Data__DbPath: /app/data/greenglow.db
+      # The address the browser uses (an origin, no path), which GreenGlow checks requests' origin against.
+      Server__PublicUrl: ${SIM_I_PUBLIC_URL:-http://localhost:8080}
+      # TODO: GreenGlow's base-path setting, once it has one: /terminal.
+      Server__TrustForwardedHeaders: "true"
+      # First start only: sign-in with Sim i's users, and the break-glass administrator's password.
+      Setup__Method: ibmi
+      Setup__BreakglassPassword: ${GREENGLOW_BREAKGLASS_PASSWORD:-}
+      Setup__IbmI__Connection: sim-i
+      Setup__IbmI__AdminGroups: ${SIM_I_ADMIN_GROUP:-SIMADMIN}
+      Seed__ConnectionsJson: '{"connections":[{"name":"sim-i","label":"Sim i","url":"tcp://sim-i:2323","maxSessionsPerUser":3,"access":[{"type":"group","name":"Everyone"}]}]}'
+    networks: [terminal]
+    volumes:
+      - greenglow-data:/app/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  # PostgreSQL and Sim i.
+  database:
+  # The proxy and Sim i: the web interface, and the gate code-server's requests pass.
+  web:
+  # code-server, Sim i (its extension uses the web and debug ports) and the proxy. Not internal, so git can push.
+  code:
+  # GreenGlow, Sim i (5250 and the host servers) and the proxy. Internal: GreenGlow reaches nothing else.
+  terminal:
+    internal: true
+
+volumes:
+  postgres-data:
+  sim-i-ifs:
+  sim-i-certs:
+  caddy-data:
+  code-server-home:
+  greenglow-data:
