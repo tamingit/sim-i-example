@@ -1,0 +1,13 @@
+{
+  "users": [
+    { "name": "CRMUSR1", "password": "Crm12345", "text": "CRM demo: Jordan Lee", "currentLibrary": "CRMDEMO",
+      "initialProgram": "CRMDEMO/CRMMENU", "initialMenu": "*SIGNOFF" },
+    { "name": "CRMUSR2", "password": "Crm12345", "text": "CRM demo: Sam Patel", "currentLibrary": "CRMDEMO",
+      "initialProgram": "CRMDEMO/CRMMENU", "initialMenu": "*SIGNOFF" },
+    { "name": "CRMUSR3", "password": "Crm12345", "text": "CRM demo: Casey Morgan", "currentLibrary": "CRMDEMO",
+      "initialProgram": "CRMDEMO/CRMMENU", "initialMenu": "*SIGNOFF" }
+  ],
+  "commands": [
+    "CALL CRMDEMO/CRMBUILD PARM('*YES')"
+  ]
+}

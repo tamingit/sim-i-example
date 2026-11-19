@@ -54,6 +54,10 @@ extension = member type.
 
 ## Setup
 
+On Sim i there's nothing to do: `initial.json` runs the build below and makes the three demo users the first time
+Sim i reads this library. Each of them starts in the CRM's menu (`INLPGM(CRMDEMO/CRMMENU)`) and is signed off on
+leaving it (`INLMNU(*SIGNOFF)`); their password is `Crm12345`. On an IBM i, these steps set it up:
+
 ### 1. Library and source files
 
 The RPG and SQL sources use lines up to 100 characters, so create those

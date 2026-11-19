@@ -15,14 +15,16 @@ Then open <http://localhost:8080> and sign on as `DEV` / `ChangeMe!` (set in `.e
 | <http://localhost:8080/> | Sim i's launchpad: Code, Terminal, the source editor, Profiles and Receive from an IBM i, each opening in a tab of its own. For the `SIMADMIN` group's members, which `DEV` is in; anyone else who signs on is sent to the terminal. |
 | <http://localhost:8080/code/> | code-server (VS Code) on `source/`, for `DEV` only. Saving a member compiles it on Sim i; the first save asks for `DEV`'s password. F5 on an RPG member debugs it. |
 | <http://localhost:8080/terminal/> | GreenGlow Connect: 5250 sessions on Sim i, signing on with Sim i's users. |
-| `localhost:2323` | Any TN5250 client. Try `CALL DEMOCUST/CUSTMNT`, `CALL DEMOLIB/HELLO`, or the CRM in `source/CRMDEMO` (see its README). |
+| `localhost:2323` | Any TN5250 client. Try `CALL DEMOCUST/CUSTMNT`, `CALL DEMOLIB/HELLO`, or the CRM in `source/CRMDEMO` (see its README): sign on as `CRMUSR1`, `CRMUSR2` or `CRMUSR3` (password `Crm12345`) and you're in its menu. |
 
 ## What's here
 
 - `compose.yml`: PostgreSQL, Sim i, the proxy that puts the three web apps on one address, code-server and GreenGlow.
 - `.env`: the settings: the developer and password, the image tags, who owns `source/` and the published ports.
 - `source/`: the examples, a folder for each library (`DEMOLIB`, `DEMOCUST`, `CRMDEMO`). Sim i reads it at each
-  start; code-server edits it.
+  start; code-server edits it. `source/CRMDEMO/initial.json` sets the CRM up the first time Sim i reads it: its
+  three users, each starting in the CRM's menu, and its build, which makes the tables, the sample data and the
+  programs.
 - `Caddyfile`: the proxy's routes. code-server is reached only after Sim i says the request is `DEV`'s.
 - `code-server/`: the code-server image, with the Sim i extension taken from the Sim i image.
 
@@ -37,7 +39,8 @@ Then open <http://localhost:8080> and sign on as `DEV` / `ChangeMe!` (set in `.e
 ## Notes
 
 - `docker compose restart sim-i` reads `source/` again; members saved from code-server are compiled straight away.
-- `docker compose down -v` deletes the database and everything else the volumes keep, to start clean.
+- `docker compose down -v` deletes the database and everything else the volumes keep, to start clean. The next start
+  runs each library's `initial.json` again; until then it isn't run, even if it changes.
 - git works in code-server when `source/` is a repository of its own (`git init` in it, or clone into it). Set
   `SIM_I_GIT_NAME`, `SIM_I_GIT_EMAIL` and, for SSH remotes, `SIM_I_GIT_SSH_KEY` in `.env`.
 - GreenGlow needs an image (`GREENGLOW_TAG`) that serves under `/terminal/` and signs on with IBM i users.
