@@ -2,14 +2,32 @@
 #   /            Sim i's web interface: the administrators' group's members (others are sent to /terminal/)
 #   /code/       code-server, for the developer only: Sim i's gate decides each request from its sign-on cookie
 #   /terminal/   GreenGlow, which signs people on itself, against Sim i's users
-# SIM_I_SITE is the address the proxy serves: ":8080" for plain HTTP (the default), or a host name for HTTPS
-# with a certificate Caddy gets itself (publish 80 and 443 instead: see compose.yaml).
+#   /sim-i-ca.crt  with HTTPS on a certificate of its own: the certificate authority to trust (see README.md, HTTPS)
+# SIM_I_SITE is the address the proxy serves: ":8080" for plain HTTP (the default), or https:// and the address
+# the browser has (https://sim-i.lan:8080), with a certificate of Caddy's own local certificate authority when
+# SIM_I_CERTS is local_certs, or else one it gets from Let's Encrypt for a public host name (publish 80 and 443).
 
 {
 	admin off
+	# SIM_I_CERTS: local_certs (self-signed: Caddy's own authority signs the site's certificate) or nothing.
+	{$SIM_I_CERTS}
+	# The certificate for a client that doesn't say which name it wants, as browsers don't for an IP address.
+	default_sni {$SIM_I_DEFAULT_SNI:localhost}
+	# Caddy can't add its authority to this container's trust store, and nothing here needs it to.
+	skip_install_trust
 }
 
 {$SIM_I_SITE} {
+	# The local authority's root certificate, to trust on each computer that uses the site: browsers show code-server's
+	# web views (Markdown preview, other extensions' pages) only on a certificate they trust, not one clicked past.
+	handle /sim-i-ca.crt {
+		root * /data/caddy/pki/authorities/local
+		rewrite * /root.crt
+		header Content-Type application/x-x509-ca-cert
+		header Content-Disposition "attachment; filename=sim-i-ca.crt"
+		file_server
+	}
+
 	# code-server: forward_auth asks Sim i first, passing the browser's cookie. Sim i answers 204 for the developer, a
 	# redirect to its sign-on page (and back) for anyone not signed on, and 403 for everyone else. code-server is
 	# served under /code/ with the prefix taken off, which it supports.

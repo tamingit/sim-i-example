@@ -36,6 +36,39 @@ Then open <http://localhost:8080> and sign on as `DEV` / `ChangeMe!` (set in `.e
   reach this machine. Everything is published on `127.0.0.1` unless `SIM_I_HOST` says otherwise.
 - The ports above (and 449, 992, 4711, 5432, 8473 to 8476, 9473 to 9476) must be free.
 
+## HTTPS with a self-signed certificate (optional)
+
+Plain HTTP is the default, and everything Sim i adds to code-server works over it. Over plain HTTP from another
+computer, though, code-server's own web views stay blank (Markdown preview, and other extensions' pages): browsers
+allow the service worker they need only on HTTPS or `localhost`. For those, or simply for HTTPS, the proxy can serve
+it on a certificate of its own, signed by Caddy's local certificate authority, with no domain or Let's Encrypt.
+
+1. In `.env`, with the address the browser uses (a host name, or an IP address) and the published port:
+
+   ```bash
+   SIM_I_HOST=0.0.0.0                        # reachable from other computers
+   SIM_I_SITE=https://sim-i.lan:8080         # several: https://sim-i.lan:8080, https://192.168.1.50:8080
+   SIM_I_CERTS=local_certs
+   SIM_I_PUBLIC_URL=https://sim-i.lan:8080   # GreenGlow checks requests against it: the address people use
+   # SIM_I_DEFAULT_SNI=192.168.1.50          # only when it's reached by an IP address
+   ```
+
+2. `docker compose up -d`. Caddy makes its authority the first time and keeps it in the `caddy-data` volume
+   (`docker compose down -v` throws it away, and the next start makes a new one to trust again).
+3. On each computer that uses the site, trust the authority. Download it from `https://sim-i.lan:8080/sim-i-ca.crt`
+   (past the browser's warning, this once), or copy it from the proxy:
+   `docker compose cp proxy:/data/caddy/pki/authorities/local/root.crt sim-i-ca.crt`. Then:
+   - Windows: double-click it, Install Certificate, Local Machine, "Trusted Root Certification Authorities".
+   - macOS: open it in Keychain Access (System keychain), and set Trust to Always Trust.
+   - Linux: copy it to `/usr/local/share/ca-certificates/sim-i-ca.crt` and run `sudo update-ca-certificates`.
+   - Firefox has trust of its own: Settings, Certificates, View Certificates, Authorities, Import.
+
+   Restart the browser. Clicking past the warning isn't enough: browsers don't run service workers on a certificate
+   they don't trust, so code-server's web views would stay blank.
+
+The authority's root lasts ten years; the site's certificate is renewed by Caddy itself. Trust only an authority
+you made: its key, in `caddy-data`, can sign a certificate for any site.
+
 ## Notes
 
 - `docker compose restart sim-i` reads `source/` again; members saved from code-server are compiled straight away.

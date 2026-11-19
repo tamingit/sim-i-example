@@ -77,14 +77,17 @@ services:
       - sim-i-certs:/certs
       - ./source:/source:ro
 
-  # The one web address. SIM_I_SITE ":8080" is plain HTTP; for HTTPS, set it to the host name and publish 80 and 443
-  # in place of the line below ("${SIM_I_HOST:-127.0.0.1}:443:443" and the same for 80).
+  # The one web address. SIM_I_SITE ":8080" is plain HTTP; "https://sim-i.lan:8080" with SIM_I_CERTS=local_certs is
+  # HTTPS on a self-signed certificate (Caddy's own authority, kept in caddy-data: README.md, HTTPS). For a public
+  # host name with a Let's Encrypt certificate, set it to the name and publish 80 and 443 in place of the line below.
   proxy:
     image: caddy:2.11.7-alpine
     restart: unless-stopped
     depends_on: [sim-i]
     environment:
       SIM_I_SITE: ${SIM_I_SITE:-:8080}
+      SIM_I_CERTS: ${SIM_I_CERTS:-}
+      SIM_I_DEFAULT_SNI: ${SIM_I_DEFAULT_SNI:-localhost}
     networks: [web, code, terminal]
     ports:
       - "${SIM_I_HOST:-127.0.0.1}:${SIM_I_WEB_PUBLISHED_PORT:-8080}:8080"
