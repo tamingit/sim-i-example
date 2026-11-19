@@ -38,7 +38,7 @@ services:
       retries: 20
 
   sim-i:
-    image: ghcr.io/tamingit/sim-i:${SIM_I_TAG:-profiling}
+    image: ghcr.io/tamingit/sim-i:${SIM_I_TAG:-prod}
     restart: unless-stopped
     depends_on:
       postgres:
@@ -110,7 +110,7 @@ services:
       # Its user takes the uid and gid that own ./source (id -u, id -g), so its files stay yours. After changing
       # them, rebuild, and remove the sim-i-examples_code-server-home volume, which belongs to the old ones.
       args:
-        SIM_I_IMAGE: ghcr.io/tamingit/sim-i:${SIM_I_TAG:-profiling}
+        SIM_I_IMAGE: ghcr.io/tamingit/sim-i:${SIM_I_TAG:-prod}
         SIM_I_UID: ${SIM_I_UID:-1000}
         SIM_I_GID: ${SIM_I_GID:-1000}
     restart: unless-stopped

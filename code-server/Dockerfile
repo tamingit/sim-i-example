@@ -1,7 +1,7 @@
 # code-server (VS Code in the browser) for Sim i's developer, with Sim i's extension, which comes from the Sim i
 # image (SIM_I_IMAGE). compose.yml builds it. It opens /source, and saving a file there compiles it on Sim i.
 
-ARG SIM_I_IMAGE=ghcr.io/tamingit/sim-i:profiling
+ARG SIM_I_IMAGE=ghcr.io/tamingit/sim-i:prod
 FROM ${SIM_I_IMAGE} AS sim-i
 
 FROM codercom/code-server:4.145.0
